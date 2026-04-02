@@ -7,6 +7,8 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\MovementController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\SecteurController;
+use App\Http\Controllers\FiliereController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -43,6 +45,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Users
     Route::resource('users', UserController::class)->except(['show']);
+
+    // middleware auth
+    Route::resource('secteurs', SecteurController::class)->except(['show']);
+    Route::resource('filieres', FiliereController::class)->except(['show']);
 });
 
 require __DIR__.'/auth.php';
