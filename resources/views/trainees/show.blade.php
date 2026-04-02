@@ -4,86 +4,231 @@
 
 @section('content_header')
     <div class="d-flex justify-content-between align-items-center">
-        <h1><i class="fas fa-user"></i> {{ $trainee->last_name }} {{ $trainee->first_name }}</h1>
-        <a href="{{ route('trainees.index') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Retour
-        </a>
+        <h1>
+            <i class="fas fa-user"></i>
+            {{ $trainee->last_name }} {{ $trainee->first_name }}
+        </h1>
+        <div>
+            @if(!$trainee->validation)
+                <a href="{{ route('validations.create', $trainee) }}"
+                   class="btn btn-success mr-2">
+                    <i class="fas fa-check-double"></i> Validation finale
+                </a>
+            @else
+                <a href="{{ route('validations.show', $trainee) }}"
+                   class="btn btn-success mr-2">
+                    <i class="fas fa-check-circle"></i> Voir validation
+                    <span class="badge badge-light">
+                        {{ $trainee->validation->date_validation->format('d/m/Y') }}
+                    </span>
+                </a>
+            @endif
+            <a href="{{ route('trainees.edit', $trainee) }}"
+               class="btn btn-warning mr-2">
+                <i class="fas fa-edit"></i> Modifier
+            </a>
+            <a href="{{ route('trainees.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Retour
+            </a>
+        </div>
     </div>
 @stop
 
 @section('content')
+
+{{-- Badge validation en haut --}}
+@if($trainee->validation)
+<div class="alert alert-success">
+    <i class="fas fa-check-double"></i>
+    <strong>Stagiaire validé le {{ $trainee->validation->date_validation->format('d/m/Y') }}</strong>
+    — par {{ $trainee->validation->user->name }}
+</div>
+@endif
+
 <div class="row">
+
+    {{-- Colonne gauche: Info stagiaire --}}
     <div class="col-md-4">
         <div class="card card-primary card-outline">
             <div class="card-body text-center">
                 @if($trainee->image_profile)
                     <img src="{{ asset('storage/' . $trainee->image_profile) }}"
-                         class="img-fluid rounded-circle mb-3" style="width:120px;height:120px;object-fit:cover">
+                         class="img-fluid rounded-circle mb-3"
+                         style="width:120px;height:120px;object-fit:cover"
+                         alt="Photo">
                 @else
-                    <div class="bg-secondary rounded-circle d-inline-flex align-items-center
-                                justify-content-center mb-3"
+                    <div class="bg-secondary rounded-circle d-inline-flex
+                                align-items-center justify-content-center mb-3"
                          style="width:120px;height:120px">
                         <i class="fas fa-user fa-3x text-white"></i>
                     </div>
                 @endif
                 <h4>{{ $trainee->last_name }} {{ $trainee->first_name }}</h4>
-                <p class="text-muted">{{ $trainee->filiere->nom_filiere }}</p>
+                <p class="text-muted mb-0">{{ $trainee->filiere->nom_filiere }}</p>
+                <p class="text-muted">
+                    <small>{{ $trainee->filiere->secteur->nom_secteur }}</small>
+                </p>
+
+                @if($trainee->validation)
+                    <span class="badge badge-success badge-lg p-2">
+                        <i class="fas fa-check-double"></i> VALIDÉ
+                    </span>
+                @else
+                    <span class="badge badge-secondary badge-lg p-2">
+                        <i class="fas fa-clock"></i> En cours
+                    </span>
+                @endif
             </div>
-            <div class="card-footer">
-                <table class="table table-sm">
-                    <tr><th>CIN</th><td>{{ $trainee->cin }}</td></tr>
-                    <tr><th>Secteur</th><td>{{ $trainee->filiere->secteur->nom_secteur }}</td></tr>
-                    <tr><th>Groupe</th><td>{{ $trainee->group }}</td></tr>
-                    <tr><th>Promotion</th><td>{{ $trainee->graduation_year }}</td></tr>
+            <div class="card-footer p-0">
+                <table class="table table-sm mb-0">
+                    <tr>
+                        <th class="pl-3">CIN</th>
+                        <td>{{ $trainee->cin }}</td>
+                    </tr>
+                    <tr>
+                        <th class="pl-3">CEF</th>
+                        <td>{{ $trainee->cef ?? '—' }}</td>
+                    </tr>
+                    <tr>
+                        <th class="pl-3">Date naissance</th>
+                        <td>
+                            {{ $trainee->date_naissance
+                                ? \Carbon\Carbon::parse($trainee->date_naissance)->format('d/m/Y')
+                                : '—' }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="pl-3">Téléphone</th>
+                        <td>
+                            @if($trainee->phone)
+                                <a href="tel:{{ $trainee->phone }}">{{ $trainee->phone }}</a>
+                            @else
+                                —
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="pl-3">Groupe</th>
+                        <td>{{ $trainee->group }}</td>
+                    </tr>
+                    <tr>
+                        <th class="pl-3">Promotion</th>
+                        <td>{{ $trainee->graduation_year }}</td>
+                    </tr>
                 </table>
             </div>
         </div>
     </div>
 
+    {{-- Colonne droite --}}
     <div class="col-md-8">
-        <div class="card">
+
+        {{-- État des documents --}}
+        <div class="card mb-3">
             <div class="card-header bg-primary">
                 <h3 class="card-title text-white">
-                    <i class="fas fa-folder"></i> Documents
+                    <i class="fas fa-folder"></i> État des documents
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    @foreach(['Bac','Diplome','Attestation','Bulletin'] as $type)
+                    @php
+                        $doc = $trainee->documents->where('type', $type)->first();
+                    @endphp
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3 border rounded
+                            {{ !$doc ? 'border-danger bg-light' :
+                               (in_array($doc->status,['Final_Out','Remis'])
+                                   ? 'border-success bg-light'
+                                   : ($doc->status == 'Temp_Out'
+                                       ? 'border-warning bg-light'
+                                       : 'border-secondary bg-light')) }}">
+                            @if(!$doc)
+                                <i class="fas fa-times-circle fa-2x text-danger"></i>
+                                <p class="mb-0 mt-1 font-weight-bold text-danger">{{ $type }}</p>
+                                <small class="text-muted">Non enregistré</small>
+                            @elseif(in_array($doc->status, ['Final_Out','Remis']))
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                                <p class="mb-0 mt-1 font-weight-bold text-success">{{ $type }}</p>
+                                <small class="text-success">Remis</small>
+                            @elseif($doc->status == 'Temp_Out')
+                                <i class="fas fa-clock fa-2x text-warning"></i>
+                                <p class="mb-0 mt-1 font-weight-bold text-warning">{{ $type }}</p>
+                                <small class="text-warning">Retrait temp.</small>
+                            @else
+                                <i class="fas fa-archive fa-2x text-secondary"></i>
+                                <p class="mb-0 mt-1 font-weight-bold text-secondary">{{ $type }}</p>
+                                <small class="text-muted">En stock</small>
+                            @endif
+
+                            @if($doc)
+                                <br>
+                                <a href="{{ route('documents.show', $doc) }}"
+                                   class="btn btn-xs btn-outline-primary mt-1"
+                                   style="font-size:11px">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            @else
+                                <br>
+                                <a href="{{ route('documents.create') }}?trainee_id={{ $trainee->id }}"
+                                   class="btn btn-xs btn-outline-danger mt-1"
+                                   style="font-size:11px">
+                                    <i class="fas fa-plus"></i> Ajouter
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- Historique des mouvements --}}
+        <div class="card">
+            <div class="card-header bg-info">
+                <h3 class="card-title text-white">
+                    <i class="fas fa-history"></i> Historique des mouvements
                 </h3>
             </div>
             <div class="card-body p-0">
-                <table class="table table-bordered mb-0">
+                <table class="table table-sm mb-0">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Référence</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
+                            <th>Document</th>
+                            <th>Action</th>
+                            <th>Par</th>
+                            <th>Date</th>
+                            <th>Observations</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($trainee->documents as $doc)
+                        @forelse($trainee->documents->flatMap->movements->sortByDesc('date_action') as $mv)
                         <tr>
-                            <td>{{ $doc->type }}</td>
-                            <td>{{ $doc->reference_number ?? '—' }}</td>
                             <td>
-                                @if($doc->status == 'Stock')
-                                    <span class="badge badge-success">En stock</span>
-                                @elseif($doc->status == 'Temp_Out')
-                                    <span class="badge badge-warning">Retrait temporaire</span>
-                                @elseif($doc->status == 'Final_Out')
-                                    <span class="badge badge-danger">Retrait définitif</span>
+                                <span class="badge badge-primary">
+                                    {{ $mv->document->type ?? '—' }}
+                                </span>
+                            </td>
+                            <td>
+                                @if($mv->action_type == 'Saisie')
+                                    <span class="badge badge-info">Saisie</span>
+                                @elseif($mv->action_type == 'Sortie')
+                                    <span class="badge badge-warning">Sortie</span>
                                 @else
-                                    <span class="badge badge-info">Remis</span>
+                                    <span class="badge badge-success">Retour</span>
                                 @endif
                             </td>
+                            <td>{{ $mv->user->name ?? '—' }}</td>
                             <td>
-                                <a href="{{ route('documents.show', $doc) }}"
-                                   class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i>
-                                </a>
+                                {{ \Carbon\Carbon::parse($mv->date_action)->format('d/m/Y H:i') }}
                             </td>
+                            <td>{{ $mv->observations ?? '—' }}</td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="text-center text-muted">
-                                Aucun document enregistré
+                            <td colspan="5" class="text-center text-muted py-3">
+                                Aucun mouvement enregistré
                             </td>
                         </tr>
                         @endforelse
@@ -91,6 +236,7 @@
                 </table>
             </div>
         </div>
+
     </div>
 </div>
 @stop

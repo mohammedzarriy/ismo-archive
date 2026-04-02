@@ -112,12 +112,12 @@ return [
 
         // Navbar
         [
-            'type'         => 'navbar-search',
-            'text'         => 'Rechercher',
+            'type' => 'navbar-search',
+            'text' => 'Rechercher',
             'topnav_right' => true,
         ],
         [
-            'type'         => 'fullscreen-widget',
+            'type' => 'fullscreen-widget',
             'topnav_right' => true,
         ],
 
@@ -134,11 +134,11 @@ return [
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
 
-        // Stagiaires
+        // STAGIAIRES
         ['header' => 'GESTION DES STAGIAIRES'],
         [
-            'text'    => 'Stagiaires',
-            'icon'    => 'fas fa-fw fa-users',
+            'text' => 'Stagiaires',
+            'icon' => 'fas fa-fw fa-users',
             'submenu' => [
                 [
                     'text' => 'Liste des stagiaires',
@@ -158,11 +158,11 @@ return [
             ],
         ],
 
-        // Documents
+        // DOCUMENTS
         ['header' => 'GESTION DES DOCUMENTS'],
         [
-            'text'    => 'Baccalauréat',
-            'icon'    => 'fas fa-fw fa-graduation-cap',
+            'text' => 'Baccalauréat',
+            'icon' => 'fas fa-fw fa-graduation-cap',
             'submenu' => [
                 [
                     'text' => 'Liste',
@@ -170,17 +170,17 @@ return [
                     'icon' => 'fas fa-fw fa-list',
                 ],
                 [
-                    'text'        => 'Retraits temporaires',
-                    'url'         => 'documents/bac/temp-out',
-                    'icon'        => 'fas fa-fw fa-clock',
-                    'label'       => '!',
+                    'text' => 'Retraits temporaires',
+                    'url'  => 'documents/bac/temp-out',
+                    'icon' => 'fas fa-fw fa-clock',
+                    'label' => '!',
                     'label_color' => 'warning',
                 ],
             ],
         ],
         [
-            'text'    => 'Diplômes',
-            'icon'    => 'fas fa-fw fa-certificate',
+            'text' => 'Diplômes',
+            'icon' => 'fas fa-fw fa-certificate',
             'submenu' => [
                 [
                     'text' => 'Liste',
@@ -205,7 +205,7 @@ return [
             'icon' => 'fas fa-fw fa-file-contract',
         ],
 
-        // Mouvements
+        // MOUVEMENTS
         ['header' => 'MOUVEMENTS'],
         [
             'text' => 'Historique',
@@ -218,7 +218,15 @@ return [
             'icon' => 'fas fa-fw fa-calendar-day',
         ],
 
-        // Administration
+        // VALIDATIONS (✔ ajouté)
+        ['header' => 'VALIDATIONS'],
+        [
+            'text' => 'Registre des validations',
+            'url'  => 'validations',
+            'icon' => 'fas fa-fw fa-check-double',
+        ],
+
+        // ADMINISTRATION
         ['header' => 'ADMINISTRATION'],
         [
             'text' => 'Utilisateurs',
@@ -227,9 +235,9 @@ return [
             'can'  => 'manage-users',
         ],
         [
-            'text'    => 'Paramètres',
-            'icon'    => 'fas fa-fw fa-sitemap',
-            'can'     => 'manage-users',
+            'text' => 'Paramètres',
+            'icon' => 'fas fa-fw fa-sitemap',
+            'can'  => 'manage-users',
             'submenu' => [
                 [
                     'text' => 'Secteurs',
@@ -256,95 +264,17 @@ return [
     ],
 
     'plugins' => [
-        'Datatables' => [
-            'active' => true,
-            'files'  => [
-                [
-                    'type'     => 'js',
-                    'asset'    => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
-                ],
-                [
-                    'type'     => 'js',
-                    'asset'    => false,
-                    'location' => '//cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js',
-                ],
-                [
-                    'type'     => 'css',
-                    'asset'    => false,
-                    'location' => '//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css',
-                ],
-            ],
-        ],
-        'Select2' => [
-            'active' => true,
-            'files'  => [
-                [
-                    'type'     => 'js',
-                    'asset'    => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js',
-                ],
-                [
-                    'type'     => 'css',
-                    'asset'    => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.css',
-                ],
-            ],
-        ],
-        'Sweetalert2' => [
-            'active' => true,
-            'files'  => [
-                [
-                    'type'     => 'js',
-                    'asset'    => false,
-                    'location' => '//cdn.jsdelivr.net/npm/sweetalert2@11',
-                ],
-            ],
-        ],
-        'Chartjs' => [
-            'active' => true,
-            'files'  => [
-                [
-                    'type'     => 'js',
-                    'asset'    => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js',
-                ],
-            ],
-        ],
-        'Pace' => [
-            'active' => false,
-            'files'  => [
-                [
-                    'type'     => 'css',
-                    'asset'    => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-center-radar.min.css',
-                ],
-                [
-                    'type'     => 'js',
-                    'asset'    => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js',
-                ],
-            ],
-        ],
+        'Datatables' => ['active' => true],
+        'Select2' => ['active' => true],
+        'Sweetalert2' => ['active' => true],
+        'Chartjs' => ['active' => true],
+        'Pace' => ['active' => false],
     ],
 
     'iframe' => [
         'default_tab' => [
-            'url'   => null,
+            'url' => null,
             'title' => null,
-        ],
-        'buttons' => [
-            'close'           => true,
-            'close_all'       => true,
-            'close_all_other' => true,
-            'scroll_left'     => true,
-            'scroll_right'    => true,
-            'fullscreen'      => true,
-        ],
-        'options' => [
-            'loading_screen'    => 1000,
-            'auto_show_new_tab' => true,
-            'use_navbar_items'  => true,
         ],
     ],
 

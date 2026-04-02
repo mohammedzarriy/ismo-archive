@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\SecteurController;
 use App\Http\Controllers\FiliereController;
+use App\Http\Controllers\ValidationController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -49,6 +50,12 @@ Route::middleware(['auth'])->group(function () {
     // middleware auth
     Route::resource('secteurs', SecteurController::class)->except(['show']);
     Route::resource('filieres', FiliereController::class)->except(['show']);
+
+    Route::get('validations', [ValidationController::class, 'index'])->name('validations.index');
+Route::get('trainees/{trainee}/validation/create', [ValidationController::class, 'create'])->name('validations.create');
+Route::post('trainees/{trainee}/validation', [ValidationController::class, 'store'])->name('validations.store');
+Route::get('trainees/{trainee}/validation', [ValidationController::class, 'show'])->name('validations.show');
+Route::delete('validations/{validation}', [ValidationController::class, 'destroy'])->name('validations.destroy');
 });
 
 require __DIR__.'/auth.php';

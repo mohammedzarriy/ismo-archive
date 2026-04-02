@@ -20,4 +20,8 @@ class Trainee extends Model
     {
         return $this->hasMany(Document::class);
     }
+    public function validation()
+{
+    return $this->hasOne(Validation::class);
+}
 }
