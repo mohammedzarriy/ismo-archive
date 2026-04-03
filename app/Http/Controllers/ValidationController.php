@@ -68,7 +68,7 @@ class ValidationController extends Controller
     {
         $request->validate([
             'date_validation' => 'required|date',
-            'signature_scan'  => 'required|image|max:5120',
+            'signature_scan'  => 'required|mimes:jpg,jpeg,png,pdf|max:5120',
             'observations'    => 'nullable|string',
         ]);
 
@@ -84,7 +84,7 @@ class ValidationController extends Controller
         ]);
 
         return redirect()->route('trainees.show', $trainee)
-            ->with('success', 'Validation enregistrée avec succès!');
+            ->with('success', 'Signature et validation enregistrées avec succès!');
     }
 
     public function show(Trainee $trainee)

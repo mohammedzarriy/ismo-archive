@@ -14,9 +14,12 @@ class DocumentController extends Controller
     public function index(Request $request)
     {
         $type = $request->get('type');
+
         $documents = Document::with('trainee.filiere')
             ->when($type, fn($q) => $q->where('type', $type))
-            ->latest()->paginate(15);
+            ->latest()
+            ->paginate(15);
+
         return view('documents.index', compact('documents', 'type'));
     }
 
@@ -68,7 +71,9 @@ class DocumentController extends Controller
             'observations' => 'nullable|string',
         ]);
 
-        $document->update(['status' => $request->action_type]);
+        $document->update([
+            'status' => $request->action_type
+        ]);
 
         $deadline = $request->action_type === 'Temp_Out'
             ? now()->addHours(48)
@@ -103,6 +108,7 @@ class DocumentController extends Controller
             ->with('success', 'Document retourné avec succès!');
     }
 
+    // 🔶 Retraits temporaires
     public function tempOut(Request $request)
     {
         $filieres = Filiere::all();
@@ -124,12 +130,36 @@ class DocumentController extends Controller
         return view('documents.temp-out', compact('documents', 'filieres', 'groups'));
     }
 
+    // 🔴 Retraits définitifs (NEW)
+    public function finalOut(Request $request)
+    {
+        $filieres = Filiere::all();
+        $groups   = Trainee::distinct()->pluck('group');
+
+        $documents = Document::with('trainee.filiere', 'movements')
+            ->where('type', 'Bac')
+            ->where('status', 'Final_Out')
+            ->when($request->filiere_id, fn($q) =>
+                $q->whereHas('trainee', fn($q) =>
+                    $q->where('filiere_id', $request->filiere_id)))
+            ->when($request->group, fn($q) =>
+                $q->whereHas('trainee', fn($q) =>
+                    $q->where('group', $request->group)))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('documents.final-out', compact('documents', 'filieres', 'groups'));
+    }
+
     public function prets()
     {
         $documents = Document::with('trainee.filiere')
             ->where('type', 'Diplome')
             ->where('status', 'Stock')
-            ->latest()->paginate(15);
+            ->latest()
+            ->paginate(15);
+
         return view('documents.prets', compact('documents'));
     }
 }

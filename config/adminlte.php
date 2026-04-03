@@ -105,6 +105,7 @@ return [
 
         // DOCUMENTS
         ['header' => 'GESTION DES DOCUMENTS'],
+
         [
             'text' => 'Baccalauréat',
             'icon' => 'fas fa-graduation-cap',
@@ -112,6 +113,7 @@ return [
                 [
                     'text' => 'Liste',
                     'url'  => 'documents/bac',
+                    'icon' => 'fas fa-list',
                 ],
                 [
                     'text' => 'Retraits temporaires',
@@ -120,8 +122,16 @@ return [
                     'label' => '!',
                     'label_color' => 'warning',
                 ],
+                [
+                    'text' => 'Retraits définitifs',
+                    'url'  => 'documents/bac/final-out',
+                    'icon' => 'fas fa-sign-out-alt',
+                    'label' => '!',
+                    'label_color' => 'danger',
+                ],
             ],
         ],
+
         [
             'text' => 'Diplômes',
             'icon' => 'fas fa-certificate',
@@ -137,11 +147,13 @@ return [
                 ],
             ],
         ],
+
         [
             'text' => 'Bulletins',
             'url'  => 'documents/bulletin',
             'icon' => 'fas fa-file-alt',
         ],
+
         [
             'text' => 'Attestations',
             'url'  => 'documents/attestation',
@@ -256,18 +268,6 @@ return [
 
         'Pace' => [
             'active' => false,
-            'files' => [
-                [
-                    'type' => 'css',
-                    'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-center-radar.min.css',
-                ],
-                [
-                    'type' => 'js',
-                    'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/pace.min.js',
-                ],
-            ],
         ],
     ],
 

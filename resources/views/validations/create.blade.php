@@ -1,29 +1,32 @@
 @extends('adminlte::page')
+
 @section('title', 'Validation finale')
+
 @section('content_header')
     <h1>
         <i class="fas fa-check-double"></i>
         Validation — {{ $trainee->last_name }} {{ $trainee->first_name }}
     </h1>
 @stop
+
 @section('content')
 
 @if(count($missing) > 0)
-<div class="alert alert-warning">
-    <h5><i class="fas fa-exclamation-triangle"></i> Documents non remis:</h5>
-    @foreach($missing as $m)
-        <span class="badge badge-danger mr-1">{{ $m }}</span>
-    @endforeach
-    <p class="mt-2 mb-0">
-        Ces documents n'ont pas encore été remis définitivement.
-        Voulez-vous continuer quand même?
-    </p>
-</div>
+    <div class="alert alert-warning">
+        <h5><i class="fas fa-exclamation-triangle"></i> Documents non remis:</h5>
+        @foreach($missing as $m)
+            <span class="badge badge-danger mr-1">{{ $m }}</span>
+        @endforeach
+        <p class="mt-2 mb-0">
+            Ces documents n'ont pas encore été remis définitivement.
+            Voulez-vous continuer quand même?
+        </p>
+    </div>
 @else
-<div class="alert alert-success">
-    <i class="fas fa-check-circle"></i>
-    <strong>Tous les documents ont été remis!</strong> Vous pouvez procéder à la validation.
-</div>
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i>
+        <strong>Tous les documents ont été remis!</strong> Vous pouvez procéder à la validation.
+    </div>
 @endif
 
 <div class="row">
@@ -52,31 +55,29 @@
             <div class="card-body p-0">
                 <table class="table table-sm mb-0">
                     @foreach(['Bac','Diplome','Attestation','Bulletin'] as $type)
-                    @php
-                        $doc = $trainee->documents->where('type', $type)->first();
-                    @endphp
-                    <tr>
-                        <td>{{ $type }}</td>
-                        <td>
-                            @if(!$doc)
-                                <span class="badge badge-light border">
-                                    <i class="fas fa-times text-danger"></i> Non enregistré
-                                </span>
-                            @elseif(in_array($doc->status, ['Final_Out','Remis']))
-                                <span class="badge badge-success">
-                                    <i class="fas fa-check"></i> Remis
-                                </span>
-                            @elseif($doc->status == 'Temp_Out')
-                                <span class="badge badge-warning">
-                                    <i class="fas fa-clock"></i> Retrait temp.
-                                </span>
-                            @else
-                                <span class="badge badge-secondary">
-                                    <i class="fas fa-archive"></i> En stock
-                                </span>
-                            @endif
-                        </td>
-                    </tr>
+                        @php $doc = $trainee->documents->where('type', $type)->first(); @endphp
+                        <tr>
+                            <td>{{ $type }}</td>
+                            <td>
+                                @if(!$doc)
+                                    <span class="badge badge-light border">
+                                        <i class="fas fa-times text-danger"></i> Non enregistré
+                                    </span>
+                                @elseif(in_array($doc->status, ['Final_Out','Remis']))
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-check"></i> Remis
+                                    </span>
+                                @elseif($doc->status == 'Temp_Out')
+                                    <span class="badge badge-warning">
+                                        <i class="fas fa-clock"></i> Retrait temp.
+                                    </span>
+                                @else
+                                    <span class="badge badge-secondary">
+                                        <i class="fas fa-archive"></i> En stock
+                                    </span>
+                                @endif
+                            </td>
+                        </tr>
                     @endforeach
                 </table>
             </div>
@@ -88,13 +89,15 @@
         <div class="card card-success card-outline">
             <div class="card-header">
                 <h3 class="card-title">
-                    <i class="fas fa-signature"></i> Enregistrer la validation
+                    <i class="fas fa-signature"></i>
+                    Enregistrer la validation
                 </h3>
             </div>
             <div class="card-body">
                 <form action="{{ route('validations.store', $trainee) }}"
                       method="POST" enctype="multipart/form-data">
                     @csrf
+
                     <div class="form-group">
                         <label>Date de validation <span class="text-danger">*</span></label>
                         <input type="date" name="date_validation"
@@ -105,36 +108,45 @@
                         @enderror
                     </div>
 
+                    {{-- Upload signature --}}
                     <div class="form-group">
                         <label>
-                            Scan de la signature / Registre
+                            <i class="fas fa-signature"></i>
+                            Scan de la signature du registre
                             <span class="text-danger">*</span>
                         </label>
-                        <div class="custom-file">
-                            <input type="file"
-                                   class="custom-file-input @error('signature_scan') is-invalid @enderror"
-                                   id="signature_scan"
-                                   name="signature_scan"
-                                   accept="image/*,.pdf"
-                                   required>
-                            <label class="custom-file-label" for="signature_scan">
-                                Choisir le fichier scanné...
-                            </label>
+                        <div class="card border-primary">
+                            <div class="card-body text-center py-4" id="drop-zone"
+                                 style="border: 2px dashed #007bff; cursor:pointer; border-radius:8px">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-2"></i>
+                                <p class="mb-1">Glissez le scan ici ou</p>
+                                <label for="signature_scan" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-folder-open"></i> Choisir le fichier
+                                </label>
+                                <input type="file"
+                                       id="signature_scan"
+                                       name="signature_scan"
+                                       accept="image/*,.pdf"
+                                       style="display:none"
+                                       required>
+                                <p class="text-muted mt-2 mb-0">
+                                    <small>JPG, PNG, PDF — Max 5MB</small>
+                                </p>
+                                <p id="file-name" class="text-success mt-1 mb-0 font-weight-bold"></p>
+                            </div>
                         </div>
                         @error('signature_scan')
-                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                            <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
-                        <small class="text-muted">
-                            Formats acceptés: JPG, PNG, PDF — Max: 5MB
-                        </small>
                     </div>
 
-                    {{-- Preview image --}}
+                    {{-- Preview --}}
                     <div id="preview-container" class="mb-3" style="display:none">
-                        <label>Aperçu:</label>
-                        <br>
-                        <img id="preview-img" src="" class="img-fluid border rounded"
-                             style="max-height:300px">
+                        <label><i class="fas fa-eye"></i> Aperçu du scan:</label>
+                        <div class="border rounded p-2 text-center">
+                            <img id="preview-img" src="" class="img-fluid"
+                                 style="max-height:400px" alt="Aperçu">
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -160,23 +172,51 @@
 
 @section('js')
 <script>
-    // Custom file label
+    // File selection & preview
     $('#signature_scan').on('change', function() {
-        var fileName = $(this).val().split('\\').pop();
-        $(this).next('.custom-file-label').text(fileName);
-
-        // Preview
         var file = this.files[0];
-        if (file && file.type.startsWith('image/')) {
+        if (!file) return;
+
+        // اسم الملف
+        $('#file-name').text('✓ ' + file.name);
+
+        // Preview للصور
+        if (file.type.startsWith('image/')) {
             var reader = new FileReader();
             reader.onload = function(e) {
                 $('#preview-img').attr('src', e.target.result);
                 $('#preview-container').show();
-            }
+            };
             reader.readAsDataURL(file);
         } else {
+            // PDF
             $('#preview-container').hide();
+            $('#file-name').text('✓ PDF: ' + file.name);
         }
+    });
+
+    // Click على Drop zone
+    $('#drop-zone').on('click', function() {
+        $('#signature_scan').trigger('click');
+    });
+
+    // Drag & Drop support
+    $('#drop-zone').on('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('border-primary bg-light');
+    });
+
+    $('#drop-zone').on('dragleave drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('border-primary bg-light');
+    });
+
+    $('#drop-zone').on('drop', function(e) {
+        var files = e.originalEvent.dataTransfer.files;
+        if(files.length) $('#signature_scan')[0].files = files;
+        $('#signature_scan').trigger('change');
     });
 </script>
 @stop
