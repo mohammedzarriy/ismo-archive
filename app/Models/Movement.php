@@ -7,8 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Movement extends Model
 {
     protected $fillable = [
-        'document_id', 'user_id', 'action_type',
-        'date_action', 'observations'
+        'document_id',
+        'user_id',
+        'action_type',
+        'date_action',
+        'deadline',
+        'observations',
+    ];
+
+    protected $casts = [
+        'date_action' => 'datetime',
+        'deadline'    => 'datetime',
     ];
 
     public function document()
