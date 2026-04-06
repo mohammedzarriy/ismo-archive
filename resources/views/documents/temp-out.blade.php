@@ -20,7 +20,8 @@
     <div class="card-body">
         <form method="GET" action="{{ route('documents.bac.temp-out') }}">
             <div class="row">
-                <div class="col-md-4">
+
+                <div class="col-md-3">
                     <label>Filière</label>
                     <select name="filiere_id" class="form-control select2">
                         <option value="">— Toutes les filières —</option>
@@ -32,10 +33,11 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
+
+                <div class="col-md-2">
                     <label>Groupe</label>
                     <select name="group" class="form-control">
-                        <option value="">— Tous les groupes —</option>
+                        <option value="">— Tous —</option>
                         @foreach($groups as $g)
                             <option value="{{ $g }}"
                                 {{ request('group') == $g ? 'selected' : '' }}>
@@ -44,7 +46,34 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+
+                <div class="col-md-2">
+                    <label>Année promotion</label>
+                    <select name="graduation_year" class="form-control">
+                        <option value="">— Toutes —</option>
+                        @foreach($years as $y)
+                            <option value="{{ $y }}"
+                                {{ request('graduation_year') == $y ? 'selected' : '' }}>
+                                {{ $y }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label>Année d'étude</label>
+                    <select name="annee_etude" class="form-control">
+                        <option value="">— Toutes —</option>
+                        @foreach($annees_etude as $a)
+                            <option value="{{ $a }}"
+                                {{ request('annee_etude') == $a ? 'selected' : '' }}>
+                                {{ $a }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary mr-2">
                         <i class="fas fa-filter"></i> Filtrer
                     </button>
@@ -52,6 +81,7 @@
                         <i class="fas fa-times"></i> Reset
                     </a>
                 </div>
+
             </div>
         </form>
     </div>
@@ -68,6 +98,7 @@
         else $ok++;
     }
 @endphp
+
 <div class="row mb-3">
     <div class="col-md-4">
         <div class="small-box bg-danger">
@@ -78,6 +109,7 @@
             <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
         </div>
     </div>
+
     <div class="col-md-4">
         <div class="small-box bg-warning">
             <div class="inner">
@@ -87,6 +119,7 @@
             <div class="icon"><i class="fas fa-clock"></i></div>
         </div>
     </div>
+
     <div class="col-md-4">
         <div class="small-box bg-info">
             <div class="inner">
@@ -116,36 +149,38 @@
                     <th>Actions</th>
                 </tr>
             </thead>
+
             <tbody>
                 @forelse($documents as $doc)
                 @php
-                    $lastSortie = $doc->movements
-                        ->where('action_type', 'Sortie')
-                        ->sortByDesc('date_action')
-                        ->first();
-                    $deadline   = $lastSortie?->deadline
-                        ? \Carbon\Carbon::parse($lastSortie->deadline)
-                        : null;
+                    $lastSortie = $doc->movements->where('action_type', 'Sortie')->sortByDesc('date_action')->first();
+                    $deadline   = $lastSortie?->deadline ? \Carbon\Carbon::parse($lastSortie->deadline) : null;
                     $isExpired  = $deadline && now()->gt($deadline);
-                    $overdue    = null;
+
+                    $overdue = null;
                     if ($isExpired) {
-                        $diff    = $deadline->diff(now());
+                        $diff = $deadline->diff(now());
                         $overdue = $diff->days > 0
-                            ? $diff->days . 'j ' . $diff->h . 'h ' . $diff->i . 'min'
-                            : $diff->h . 'h ' . $diff->i . 'min';
+                            ? $diff->days.'j '.$diff->h.'h '.$diff->i.'min'
+                            : $diff->h.'h '.$diff->i.'min';
                     }
+
                     $hoursLeft = (!$isExpired && $deadline)
                         ? now()->diffInHours($deadline, false)
                         : null;
                 @endphp
+
                 <tr class="{{ $isExpired ? 'table-danger' : '' }}">
                     <td>{{ $loop->iteration }}</td>
+
                     <td>
                         <a href="{{ route('trainees.show', $doc->trainee) }}">
                             {{ $doc->trainee->last_name }} {{ $doc->trainee->first_name }}
                         </a>
                     </td>
+
                     <td>{{ $doc->trainee->cin }}</td>
+
                     <td>
                         @if($doc->trainee->phone)
                             <a href="tel:{{ $doc->trainee->phone }}">
@@ -155,72 +190,81 @@
                             <span class="text-muted">—</span>
                         @endif
                     </td>
+
                     <td>{{ $doc->trainee->filiere->nom_filiere }}</td>
                     <td>{{ $doc->trainee->group }}</td>
+
                     <td>
                         {{ $lastSortie
                             ? \Carbon\Carbon::parse($lastSortie->date_action)->format('d/m/Y H:i')
                             : '—' }}
                     </td>
+
                     <td>
                         {{ $deadline ? $deadline->format('d/m/Y H:i') : '—' }}
                     </td>
+
                     <td>
                         @if($isExpired)
                             <span class="badge badge-danger">
-                                <i class="fas fa-exclamation-triangle"></i> Expiré
+                                Expiré
                             </span>
                             <br>
                             <small class="text-danger font-weight-bold">
-                                <i class="fas fa-hourglass-end"></i> Retard: {{ $overdue }}
+                                Retard: {{ $overdue }}
                             </small>
+
                         @elseif($hoursLeft !== null)
+
                             @if($hoursLeft <= 6)
                                 <span class="badge badge-danger">
-                                    <i class="fas fa-fire"></i> {{ $hoursLeft }}h restantes
+                                    {{ $hoursLeft }}h restantes
                                 </span>
+
                             @elseif($hoursLeft <= 24)
                                 <span class="badge badge-warning">
-                                    <i class="fas fa-clock"></i> {{ $hoursLeft }}h restantes
+                                    {{ $hoursLeft }}h restantes
                                 </span>
+
                             @else
                                 <span class="badge badge-success">
-                                    <i class="fas fa-check"></i> {{ $hoursLeft }}h restantes
+                                    {{ $hoursLeft }}h restantes
                                 </span>
                             @endif
+
                         @else
                             <span class="badge badge-secondary">—</span>
                         @endif
                     </td>
+
                     <td>
                         <a href="{{ route('documents.show', $doc) }}"
-                           class="btn btn-sm btn-info"
-                           title="Voir détails">
+                           class="btn btn-sm btn-info">
                             <i class="fas fa-eye"></i>
                         </a>
+
                         <form action="{{ route('documents.retour', $doc) }}"
                               method="POST" style="display:inline">
                             @csrf
                             <button type="submit"
                                     class="btn btn-sm btn-success"
-                                    title="Confirmer le retour"
                                     onclick="return confirm('Confirmer le retour du Bac?')">
                                 <i class="fas fa-undo"></i> Retour
                             </button>
                         </form>
                     </td>
                 </tr>
+
                 @empty
                 <tr>
                     <td colspan="10" class="text-center py-4 text-success">
-                        <i class="fas fa-check-circle fa-2x"></i>
-                        <br>
                         <strong>Aucun retrait temporaire en cours</strong>
                     </td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
+
         {{ $documents->links() }}
     </div>
 </div>
@@ -229,12 +273,13 @@
 @section('js')
 <script>
     $('#tempout-table').DataTable({
-        "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/French.json"
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.10.19/i18n/French.json"
         },
-        "paging": false,
-        "order": [[8, "desc"]]
+        paging: false,
+        order: [[8, "desc"]]
     });
+
     $('.select2').select2();
 </script>
 @stop

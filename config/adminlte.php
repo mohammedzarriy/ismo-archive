@@ -94,7 +94,7 @@ return [
     'right_sidebar_scrollbar_theme' => 'os-theme-light',
     'right_sidebar_scrollbar_auto_hide' => 'l',
 
-    'use_route_url' => true,
+    'use_route_url' => false,
     'dashboard_url' => 'dashboard',
     'logout_url' => 'logout',
     'login_url' => 'login',
