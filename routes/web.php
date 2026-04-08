@@ -105,7 +105,9 @@ Route::middleware(['auth'])->group(function () {
     });
 
 });
-
+// signateur validation path 
+Route::post('/diplomes-prets/{trainee}/check-promote', [DiplomesPrêtsController::class, 'checkAndPromote'])->name('diplomes.checkPromote');
+Route::post('/diplomes-prets/{trainee}/signature',     [DiplomesPrêtsController::class, 'saveSignature'])->name('diplomes.saveSignature');
 
 // Routes avec rôles (admin, agent)
 Route::middleware(['auth', 'role:admin|agent'])->group(function () {
