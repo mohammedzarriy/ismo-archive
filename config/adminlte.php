@@ -1,3 +1,4 @@
+```php
 <?php
 
 return [
@@ -59,65 +60,83 @@ return [
 
     'sidebar_mini' => 'lg',
 
-    'use_route_url' => false,
+    'use_route_url' => true,
     'dashboard_url' => 'dashboard',
     'logout_url' => 'logout',
     'login_url' => 'login',
 
     'menu' => [
 
+        // 🔍 Navbar
         ['type' => 'navbar-search', 'text' => 'Rechercher', 'topnav_right' => true],
         ['type' => 'fullscreen-widget', 'topnav_right' => true],
 
-        ['text' => 'Tableau de bord', 'url' => 'dashboard', 'icon' => 'fas fa-fw fa-tachometer-alt'],
+        // 📊 Dashboard
+        ['text' => 'Tableau de bord', 'route' => 'dashboard', 'icon' => 'fas fa-fw fa-tachometer-alt'],
 
+        // 👨‍🎓 STAGIAIRES
         ['header' => 'GESTION DES STAGIAIRES'],
-        ['text' => 'Stagiaires', 'url' => 'trainees', 'icon' => 'fas fa-fw fa-users'],
-        ['text' => 'Importer Excel', 'url' => 'trainees/import', 'icon' => 'fas fa-fw fa-file-excel'],
 
+        ['text' => 'Stagiaires', 'route' => 'trainees.index', 'icon' => 'fas fa-fw fa-users'],
+
+        ['text' => 'Diplômés', 'route' => 'diplomes.prets', 'icon' => 'fas fa-fw fa-graduation-cap', 'label' => 'NEW', 'label_color' => 'success'],
+
+        ['text' => 'Importer Excel', 'route' => 'trainees.import', 'icon' => 'fas fa-fw fa-file-excel'],
+
+        // 📄 DOCUMENTS
         ['header' => 'GESTION DES DOCUMENTS'],
+
         [
             'text' => 'Baccalauréat',
             'icon' => 'fas fa-fw fa-graduation-cap',
             'submenu' => [
-                ['text' => 'Liste', 'url' => 'documents/bac', 'icon' => 'fas fa-fw fa-list'],
-                ['text' => 'Retraits temporaires', 'url' => 'documents/bac/temp-out', 'icon' => 'fas fa-fw fa-clock'],
-                ['text' => 'Retraits définitifs', 'url' => 'documents/bac/final-out', 'icon' => 'fas fa-fw fa-sign-out-alt'],
+                ['text' => 'Liste', 'route' => 'documents.bac'],
+                ['text' => 'Retraits temporaires', 'route' => 'documents.bac.temp-out'],
+                ['text' => 'Retraits définitifs', 'route' => 'documents.bac.final-out'],
             ],
         ],
+
         [
             'text' => 'Diplômes',
             'icon' => 'fas fa-fw fa-certificate',
             'submenu' => [
-                ['text' => 'Liste', 'url' => 'documents/diplome', 'icon' => 'fas fa-fw fa-list'],
-                ['text' => 'Prêts à remettre', 'url' => 'documents/diplome/prets', 'icon' => 'fas fa-fw fa-check-circle'],
+                ['text' => 'Liste', 'route' => 'documents.diplome'],
+                ['text' => 'Prêts à remettre', 'route' => 'documents.diplome.prets'],
             ],
         ],
-        ['text' => 'Bulletins de notes', 'url' => 'documents/bulletin', 'icon' => 'fas fa-fw fa-file-alt'],
-        ['text' => 'Attestations', 'url' => 'documents/attestation', 'icon' => 'fas fa-fw fa-file-contract'],
 
+        ['text' => 'Bulletins de notes', 'route' => 'documents.bulletin', 'icon' => 'fas fa-fw fa-file-alt'],
+        ['text' => 'Attestations', 'route' => 'documents.attestation', 'icon' => 'fas fa-fw fa-file-contract'],
+
+        // 🔄 MOUVEMENTS
         ['header' => 'MOUVEMENTS'],
-        ['text' => 'Historique', 'url' => 'movements', 'icon' => 'fas fa-fw fa-exchange-alt'],
-        ['text' => "Aujourd'hui", 'url' => 'movements/today', 'icon' => 'fas fa-fw fa-calendar-day'],
+
+        ['text' => 'Historique', 'route' => 'movements.index', 'icon' => 'fas fa-fw fa-exchange-alt'],
+        ['text' => "Aujourd'hui", 'route' => 'movements.today', 'icon' => 'fas fa-fw fa-calendar-day'],
+
         [
             'text' => 'Calendrier',
-            'url' => 'calendrier',
+            'route' => 'calendrier',
             'icon' => 'fas fa-fw fa-calendar-alt',
             'label' => '!',
             'label_color' => 'danger'
         ],
 
+        // ✅ VALIDATIONS
         ['header' => 'VALIDATIONS'],
-        ['text' => 'Registre', 'url' => 'validations', 'icon' => 'fas fa-fw fa-check-double'],
+        ['text' => 'Registre', 'route' => 'validations.index', 'icon' => 'fas fa-fw fa-check-double'],
 
+        // ⚙️ ADMIN
         ['header' => 'ADMINISTRATION'],
-        ['text' => 'Utilisateurs', 'url' => 'users', 'icon' => 'fas fa-fw fa-user-cog'],
+
+        ['text' => 'Utilisateurs', 'route' => 'users.index', 'icon' => 'fas fa-fw fa-user-cog'],
+
         [
             'text' => 'Paramètres',
             'icon' => 'fas fa-fw fa-cogs',
             'submenu' => [
-                ['text' => 'Secteurs', 'url' => 'secteurs', 'icon' => 'fas fa-fw fa-building'],
-                ['text' => 'Filières', 'url' => 'filieres', 'icon' => 'fas fa-fw fa-code-branch'],
+                ['text' => 'Secteurs', 'route' => 'secteurs.index'],
+                ['text' => 'Filières', 'route' => 'filieres.index'],
             ],
         ],
     ],

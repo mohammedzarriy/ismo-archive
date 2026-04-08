@@ -25,6 +25,7 @@
 </div>
 @endif
 
+{{-- Filtres --}}
 <div class="card mb-3">
     <div class="card-header bg-light">
         <h3 class="card-title"><i class="fas fa-filter"></i> Filtres</h3>
@@ -37,8 +38,7 @@
                     <select name="filiere_id" id="filiere-select" class="form-control select2">
                         <option value="">— Toutes les filières —</option>
                         @foreach($filieres as $f)
-                            <option value="{{ $f->id }}"
-                                {{ request('filiere_id') == $f->id ? 'selected' : '' }}>
+                            <option value="{{ $f->id }}" {{ request('filiere_id') == $f->id ? 'selected' : '' }}>
                                 {{ $f->code_filiere }} — {{ $f->nom_filiere }}
                             </option>
                         @endforeach
@@ -49,8 +49,7 @@
                     <select name="group" id="group-select" class="form-control">
                         <option value="">— Tous les groupes —</option>
                         @foreach($groups as $g)
-                            <option value="{{ $g }}"
-                                {{ request('group') == $g ? 'selected' : '' }}>
+                            <option value="{{ $g }}" {{ request('group') == $g ? 'selected' : '' }}>
                                 {{ $g }}
                             </option>
                         @endforeach
@@ -61,8 +60,7 @@
                     <select name="graduation_year" id="year-select" class="form-control">
                         <option value="">— Toutes les années —</option>
                         @foreach($years as $y)
-                            <option value="{{ $y }}"
-                                {{ request('graduation_year') == $y ? 'selected' : '' }}>
+                            <option value="{{ $y }}" {{ request('graduation_year') == $y ? 'selected' : '' }}>
                                 {{ $y }}
                             </option>
                         @endforeach
@@ -81,6 +79,7 @@
     </div>
 </div>
 
+{{-- Table --}}
 <div class="card">
     <div class="card-body table-responsive">
         <table id="trainees-table" class="table table-bordered table-hover">
@@ -97,6 +96,7 @@
                     <th>Filière</th>
                     <th>Groupe</th>
                     <th>Année</th>
+                    <th>Statut</th>
                     <th>Documents</th>
                     <th>Actions</th>
                 </tr>
@@ -117,12 +117,35 @@
                         @if($t->phone)
                             <a href="tel:{{ $t->phone }}">{{ $t->phone }}</a>
                         @else
-                            —
+                            — 
                         @endif
                     </td>
                     <td>{{ $t->filiere->nom_filiere ?? '—' }}</td>
                     <td>{{ $t->group }}</td>
                     <td>{{ $t->graduation_year }}</td>
+
+                    {{-- ✅ Statut Badge --}}
+                    <td>
+                        @if($t->statut == 'diplome')
+                            <span class="badge badge-success">
+                                <i class="fas fa-graduation-cap"></i> Diplômé
+                            </span>
+                        @elseif($t->statut == 'abandon')
+                            <span class="badge badge-danger">
+                                <i class="fas fa-times"></i> Abandon
+                            </span>
+                        @elseif($t->statut == 'redoublant')
+                            <span class="badge badge-warning">
+                                <i class="fas fa-redo"></i> Redoublant
+                            </span>
+                        @else
+                            <span class="badge badge-info">
+                                <i class="fas fa-book"></i> En formation
+                            </span>
+                        @endif
+                    </td>
+
+                    {{-- Documents --}}
                     <td>
                         @php
                             $docs  = $t->documents->groupBy('type');
@@ -151,17 +174,16 @@
                             @endif
                         @endforeach
                     </td>
+
+                    {{-- Actions --}}
                     <td>
-                        <a href="{{ route('trainees.show', $t) }}"
-                           class="btn btn-sm btn-info">
+                        <a href="{{ route('trainees.show', $t) }}" class="btn btn-sm btn-info">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{{ route('trainees.edit', $t) }}"
-                           class="btn btn-sm btn-warning">
+                        <a href="{{ route('trainees.edit', $t) }}" class="btn btn-sm btn-warning">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <form action="{{ route('trainees.destroy', $t) }}"
-                              method="POST" style="display:inline">
+                        <form action="{{ route('trainees.destroy', $t) }}" method="POST" style="display:inline">
                             @csrf @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger"
                                 onclick="return confirm('Confirmer la suppression?')">
@@ -169,19 +191,17 @@
                             </button>
                         </form>
 
-                        {{-- ✅ NOUVEAU — Télécharger rapport PDF --}}
-                        <a href="{{ route('trainees.report', $t) }}"
-                           target="_blank"
-                           title="Télécharger rapport PDF"
-                           class="btn btn-sm btn-dark">
+                        <a href="{{ route('trainees.report', $t) }}" target="_blank"
+                           title="Télécharger rapport PDF" class="btn btn-sm btn-dark">
                             <i class="fas fa-file-pdf"></i>
                         </a>
-
                     </td>
+
                 </tr>
                 @endforeach
             </tbody>
         </table>
+
         {{ $trainees->links() }}
     </div>
 </div>
@@ -208,17 +228,13 @@ $('#filiere-select').on('change', function() {
 
     $.get('/api/filiere/' + filiereId + '/groups', function(data) {
         var options = '<option value="">— Tous les groupes —</option>';
-        data.groups.forEach(function(g) {
-            options += '<option value="' + g + '">' + g + '</option>';
-        });
+        data.groups.forEach(function(g) { options += '<option value="' + g + '">' + g + '</option>'; });
         groupSelect.html(options);
     });
 
     $.get('/api/filiere/' + filiereId + '/years', function(data) {
         var options = '<option value="">— Toutes les années —</option>';
-        data.years.forEach(function(y) {
-            options += '<option value="' + y + '">' + y + '</option>';
-        });
+        data.years.forEach(function(y) { options += '<option value="' + y + '">' + y + '</option>'; });
         yearSelect.html(options);
     });
 });

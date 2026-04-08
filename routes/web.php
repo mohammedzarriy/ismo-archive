@@ -12,6 +12,7 @@ use App\Http\Controllers\SecteurController;
 use App\Http\Controllers\FiliereController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CalendrierController;
+use App\Http\Controllers\DiplomesPrêtsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,6 +115,6 @@ Route::middleware(['auth', 'role:admin|agent'])->group(function () {
 
 });
 
-
+Route::get('diplomes-prets', [DiplomesPrêtsController::class, 'index'])->name('diplomes.prets');
 // Auth routes (Laravel Breeze / Jetstream)
 require __DIR__.'/auth.php';
