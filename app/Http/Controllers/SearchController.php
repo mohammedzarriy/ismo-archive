@@ -26,15 +26,16 @@ class SearchController extends Controller
                 ->get()
                 ->map(function ($t) {
                     return [
-                        'id'         => $t->id,
-                        'name'       => $t->last_name.' '.$t->first_name,
-                        'cin'        => $t->cin,
-                        'cef'        => $t->cef ?? '—',
-                        'filiere'    => $t->filiere?->nom_filiere ?? '—',
-                        'url'        => route('trainees.show', $t),
-                        'validated'  => (bool) $t->validation,
-                        'docs_count' => $t->documents->count(),
-                    ];
+    'id'         => $t->id,
+    'name'       => $t->last_name . ' ' . $t->first_name,
+    'cin'        => $t->cin,
+    'cef'        => $t->cef ?? '—',
+    'filiere'    => $t->filiere->nom_filiere ?? '—',
+    'group'      => $t->group,         // زيد هاد السطر
+    'url'        => route('trainees.show', $t),
+    'validated'  => $t->validation ? true : false,
+    'docs_count' => $t->documents->count(),
+];
                 });
         }
 
